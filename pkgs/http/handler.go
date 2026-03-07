@@ -42,3 +42,17 @@ func ErrorHandler(ctx fiber.Ctx, err error) error {
 		"stack":   stack,
 	})
 }
+
+// NotFound Handler
+func NotFoundHandler(ctx fiber.Ctx) error {
+	path := ctx.Path()
+	method := ctx.Method()
+	// BadRequest Error
+	err := BadRequestError(
+		"Wrong Path",
+		"NOT_FOUND",
+		WithMeta("path", path),
+		WithMeta("method", method),
+	)
+	return err.ToJSON(ctx)
+}
