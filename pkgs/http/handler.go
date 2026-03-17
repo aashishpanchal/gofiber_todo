@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 	"runtime/debug"
-	"todo_list/boot/conf"
+	"todo_list/src/conf"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog/log"

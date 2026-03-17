@@ -6,10 +6,11 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"todo_list/boot/conf"
 	"todo_list/cmd/server"
-	"todo_list/logs"
+	"todo_list/pkgs/logs"
 	"todo_list/pkgs/utils"
+	"todo_list/src/conf"
+	"todo_list/src/db"
 
 	"github.com/gofiber/fiber/v3"
 )
@@ -17,6 +18,7 @@ import (
 func main() {
 	conf.Init()
 	logs.Init()
+	db.Connect()
 	app := server.New()
 	uri := fmt.Sprintf("%s:%d", conf.Env.HOST, conf.Env.PORT)
 	// Print banner
@@ -55,6 +57,8 @@ func main() {
 	} else {
 		fmt.Println("✅ Server gracefully stopped")
 	}
+
+	db.Disconnect()
 
 	// Add cleanup logic here
 	fmt.Println("🧹 Cleanup completed. Bye 👋")

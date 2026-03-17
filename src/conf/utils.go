@@ -46,8 +46,19 @@ func getEnvByte(key string) uint64 {
 	return bytes
 }
 
-func getEnvMs(key string, fallback ...string) int64 {
+func getEnvTime(key string, fallback ...string) time.Duration {
 	str := getEnv(key, fallback...)
-	d, _ := time.ParseDuration(str)
-	return int64(d.Seconds())
+	d, err := time.ParseDuration(str)
+	if err != nil {
+		panic(fmt.Sprintf("failed to parse %s: %v", key, err))
+	}
+	return d
+}
+
+func getEnvBool(key string, fallback bool) bool {
+	val := getEnv(key)
+	if val == "" {
+		return fallback
+	}
+	return val == "true" || val == "1"
 }

@@ -4,7 +4,8 @@ import (
 	"io"
 	"os"
 	"sync"
-	"todo_list/boot/conf"
+
+	"todo_list/src/conf"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -13,7 +14,8 @@ import (
 
 var once sync.Once
 
-const TIMESTAMP = "2006/01/02 15:04:05.000000"
+const TIMESTAMP = "2006/01/02 15:04:05.00"
+const LOG_PATh = "./pkgs/logs/server.log"
 
 func Init() {
 	once.Do(func() {
@@ -27,7 +29,7 @@ func Init() {
 		if !conf.Env.IS_DEV {
 			// Production: Stdout + Rotating file
 			fileWriter := &lumberjack.Logger{
-				Filename:   "./logs/server.log",
+				Filename:   LOG_PATh,
 				MaxSize:    100,
 				MaxBackups: 3,
 				MaxAge:     28,
