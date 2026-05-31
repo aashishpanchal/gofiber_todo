@@ -1,4 +1,4 @@
-package logs
+package logger
 
 import (
 	"io"
@@ -17,7 +17,7 @@ var once sync.Once
 const TIMESTAMP = "2006/01/02 15:04:05.00"
 const LOG_PATh = "./pkgs/logs/server.log"
 
-func Init() {
+func init() {
 	once.Do(func() {
 		var writers []io.Writer
 		// Dev: Colored console only

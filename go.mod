@@ -1,6 +1,6 @@
 module todo_list
 
-go 1.25.7
+go 1.26.3
 
 require (
 	github.com/dustin/go-humanize v1.0.1

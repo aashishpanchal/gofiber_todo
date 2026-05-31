@@ -1,16 +1,17 @@
 -- +goose Up
--- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(255) NOT NULL,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
--- +goose StatementEnd
+CREATE TABLE
+  IF NOT EXISTS "users" (
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid (),
+    "name" varchar(255) NOT NULL,
+    "email" varchar(255) NOT NULL UNIQUE,
+    "password" text NOT NULL,
+    "created_at" timestamp
+    with
+      time zone DEFAULT now () NOT NULL,
+    "updated_at" timestamp
+    with
+      time zone DEFAULT now () NOT NULL
+  );
 
 -- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS users;
--- +goose StatementEnd
+DROP TABLE IF EXISTS "users";

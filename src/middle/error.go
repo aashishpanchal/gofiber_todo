@@ -1,9 +1,10 @@
-package http
+package middle
 
 import (
 	"net/http"
 	"runtime/debug"
 	"todo_list/src/conf"
+	"todo_list/src/lib/core"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/rs/zerolog/log"
@@ -12,7 +13,10 @@ import (
 // Global Error Handler
 func ErrorHandler(ctx fiber.Ctx, err error) error {
 	// Handle known HttpError
-	if httpErr, ok := IsHttpError(err); ok {
+	if httpErr, ok := core.IsHttpError(err); ok {
+		if conf.Env.IS_DEV {
+			log.Error().Err(httpErr.Cause).Msg("HttpError Cause")
+		}
 		return httpErr.ToJSON(ctx)
 	}
 	// Handle Fiber built-in errors
@@ -48,11 +52,11 @@ func NotFoundHandler(ctx fiber.Ctx) error {
 	path := ctx.Path()
 	method := ctx.Method()
 	// BadRequest Error
-	err := BadRequestError(
+	err := core.BadRequestError(
 		"Wrong Path",
 		"NOT_FOUND",
-		WithMeta("path", path),
-		WithMeta("method", method),
+		core.WithMeta("path", path),
+		core.WithMeta("method", method),
 	)
 	return err.ToJSON(ctx)
 }

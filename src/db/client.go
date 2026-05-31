@@ -17,7 +17,7 @@ var (
 	once sync.Once
 )
 
-func Connect() {
+func init() {
 	once.Do(func() {
 		cfg, err := pgxpool.ParseConfig(conf.Env.DB_URL)
 		if err != nil {
@@ -42,11 +42,4 @@ func Connect() {
 		// Add query
 		Q = repos.New(Pool)
 	})
-}
-
-func Disconnect() {
-	if Pool != nil {
-		Pool.Close()
-		fmt.Println("✅ DB connection closed!")
-	}
 }

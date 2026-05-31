@@ -1,65 +1,50 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"log"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
-	"todo_list/cmd/server"
-	"todo_list/pkgs/logs"
-	"todo_list/pkgs/utils"
 	"todo_list/src/conf"
 	"todo_list/src/db"
+	"todo_list/src/lib/utils"
+	_ "todo_list/src/logger"
+	"todo_list/src/server"
 
 	"github.com/gofiber/fiber/v3"
 )
 
 func main() {
-	conf.Init()
-	logs.Init()
-	db.Connect()
 	app := server.New()
 	uri := fmt.Sprintf("%s:%d", conf.Env.HOST, conf.Env.PORT)
-	// Print banner
 	utils.PrintBanner(uri, conf.Env.GO_ENV)
 
-	// Run server in goroutine
+	// Listen from a different goroutine
 	go func() {
 		if err := app.Listen(uri, fiber.ListenConfig{
 			EnablePrefork:         false,
 			DisableStartupMessage: true,
-		}); err != nil {
-			fmt.Printf("❌ Server failed to start: %v\n", err)
-			os.Exit(1)
+		}); err != nil && errors.Is(err, net.ErrClosed) {
+			log.Panic(err)
 		}
 	}()
 
-	// Create channel to listen for OS signals
-	done := make(chan os.Signal, 1)
-	// Listen for SIGINT & SIGTERM (docker/podman compatible)
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
-	<-done // Block until signal received
+	done := make(chan os.Signal, 1)                                    // Create channel to signify a signal being sent
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM) // When an interrupt or termination signal is sent, notify the channel
+	defer signal.Stop(done)
 
-	fmt.Println() // New line after ^C
-	fmt.Println("🛑 Shutting down server...")
-
-	// Create timeout context
-	timer := time.AfterFunc(5*time.Second, func() {
-		fmt.Println("⚠️ Shutdown timeout reached. Forcing exit.")
-		os.Exit(1)
-	})
-	defer timer.Stop()
-
-	// Gracefully shutdown
-	if err := app.Shutdown(); err != nil {
-		fmt.Printf("❌ Server shutdown failed: %v\n", err)
-	} else {
-		fmt.Println("✅ Server gracefully stopped")
+	<-done // This blocks the main thread until an interrupt is received
+	fmt.Println("\nGracefully shutting down...")
+	if err := app.ShutdownWithTimeout(10 * time.Second); err != nil {
+		fmt.Printf("Server shutdown failed: %v\n", err)
 	}
 
-	db.Disconnect()
-
-	// Add cleanup logic here
-	fmt.Println("🧹 Cleanup completed. Bye 👋")
+	// Your cleanup tasks go here
+	fmt.Println("Running cleanup tasks...")
+	db.Pool.Close()
+	fmt.Println("Cleanup completed. Bye 👋")
 }

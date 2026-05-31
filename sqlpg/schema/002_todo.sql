@@ -1,17 +1,17 @@
 -- +goose Up
--- +goose StatementBegin
-CREATE TABLE todos (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    title TEXT NOT NULL,
-    done BOOLEAN NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
--- +goose StatementEnd
+CREATE TABLE
+  IF NOT EXISTS "todos" (
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid (),
+    "user_id" uuid NOT NULL REFERENCES users (id) ON DELETE CASCADE,
+    "title" text NOT NULL,
+    "done" boolean NOT NULL DEFAULT false,
+    "created_at" timestamp
+    with
+      time zone DEFAULT now () NOT NULL,
+    "updated_at" timestamp
+    with
+      time zone DEFAULT now () NOT NULL
+  );
 
 -- +goose Down
--- +goose StatementBegin
-DROP TABLE IF EXISTS todos;
--- +goose StatementEnd
-
+DROP TABLE IF EXISTS "todos";

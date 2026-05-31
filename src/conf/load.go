@@ -42,7 +42,7 @@ var (
 	once sync.Once
 )
 
-func Init() {
+func init() {
 	once.Do(func() {
 		if err := godotenv.Load(".env"); err != nil {
 			log.Printf("Error: .env file not found: %v\n", err)
