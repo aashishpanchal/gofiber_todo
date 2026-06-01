@@ -33,8 +33,8 @@ func main() {
 		}
 	}()
 
-	done := make(chan os.Signal, 1)                                    // Create channel to signify a signal being sent
-	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM) // When an interrupt or termination signal is sent, notify the channel
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 	defer signal.Stop(done)
 
 	<-done // This blocks the main thread until an interrupt is received
